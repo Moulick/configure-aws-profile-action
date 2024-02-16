@@ -160,9 +160,9 @@ runs:
       shell: bash
       run: |
         echo "Setting dummy AWS Environment Variables"
-        echo AWS_SECRET_ACCESS_KEY="No value here, please use the profile as \"aws --profile ${{ inputs.profile }} <command>\"" >> $GITHUB_ENV
-        echo AWS_ACCESS_KEY_ID="No value here, please use the profile as \"aws --profile ${{ inputs.profile }} <command>\""     >> $GITHUB_ENV
-        echo AWS_SESSION_TOKEN="No value here, please use the profile as \"aws --profile ${{ inputs.profile }} <command>\""     >> $GITHUB_ENV
+        echo AWS_SECRET_ACCESS_KEY="no-value-here" >> $GITHUB_ENV
+        echo AWS_ACCESS_KEY_ID="no-value-here"     >> $GITHUB_ENV
+        echo AWS_SESSION_TOKEN="no-value-here"     >> $GITHUB_ENV
 
     - name: Check Who Am I
       id: whoami

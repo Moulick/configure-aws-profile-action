@@ -118,11 +118,13 @@ jobs:
       # Example of using the profile with terragrunt
       - name: Terragrunt plan
         id: terragrunt-plan
-        uses: gruntwork-io/terragrunt-action@v1
+        uses: gruntwork-io/terragrunt-action@v2
         env:
           AWS_CONFIG_FILE: /github/workspace/.aws/config # And this is the place the AWS config file ends up mounted
           AWS_SHARED_CREDENTIALS_FILE: /github/workspace/.aws/credentials
           AWS_PROFILE: ${{ env.PROFILE_TEST }}
+          INPUT_PRE_EXEC_1: |
+            unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN
 
       # Example with generic Docker image
       # Notice the workspace mount and both the env vars, that is the place the AWS config file ends up mounted
@@ -137,4 +139,17 @@ jobs:
             if ! [ -f  ${AWS_SHARED_CREDENTIALS_FILE} ]; then echo " ${AWS_SHARED_CREDENTIALS_FILE} does not exist." fi
 
             aws sts get-caller-identity --profile ${{ env.PROFILE_TEST }}
+```
+
+# Unset AWS Environment variables
+
+There are two problems
+
+1. GitHub actions do not support unsetting and env var once it has been set, you cannot even set it to `""`
+1. AWS SDKs prefers using the `AWS_*` env variables over profile.
+
+This necessitates that the three env vars need to be unset in every step that you run. Below can be used for linux/macos runners.
+
+```shell
+unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN
 ```
