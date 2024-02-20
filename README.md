@@ -1,6 +1,8 @@
 # Configure AWS Credential Profiles for GitHub Actions
 
-The primary reason this action exists is to address using multiple profiles at the same time in GitHub Actions. The [official action](https://github.com/marketplace/actions/configure-aws-credentials-action-for-github-actions) is not sufficient for multiple account usage as it only sets one set of AWS environment variables at a time. Trying to reuse the action simply overwrites the environment variables with the new credentials.
+Drop-in replacement for aws-actions/configure-aws-credentials with additional features to configure multiple AWS roles as AWS profiles.
+
+The primary reason this action exists is to address using multiple AWS Roles at the same time in GitHub Actions. The [official action](https://github.com/marketplace/actions/configure-aws-credentials-action-for-github-actions) is not sufficient for multiple account usage as it only sets one set of AWS environment variables at a time. Trying to reuse the action simply overwrites the environment variables with the new credentials.
 
 This action uses the official `aws-actions/configure-aws-credentials@v4` under the hood. Almost all inputs of the original action are supported. The main difference is that the `profile` input is required. This action will create the `~/.aws/config` and `~/.aws/credentials` files with the specified profile name (can be overridden with `AWS_CONFIG_FILE` & `AWS_SHARED_CREDENTIALS_FILE`, details below).
 
@@ -11,8 +13,8 @@ The below inputs are in additional to the [official action inputs](https://githu
 
 | Input Name   | Description                                                                     | Required | default values |
 | :----------- | :------------------------------------------------------------------------------ | :------: | :------------: |
-| profile      | Name of the profile to be created                                               |  `true`  |    default     |
-| only-profile | This will unset the AWS env vars to empty string. Necessary for using profiles  | `false`  |     `true`     |
+| profile      | Name of the profile to be created                                               | `false`  |    default     |
+| only-profile | This will unset the AWS env vars to empty string. Necessary for using profiles  | `false`  |    `false`     |
 | whoami       | Run additional `aws sts get-caller-identity` to check if the profile is working |  `true`  |    `false`     |
 
 # Unsupported Inputs

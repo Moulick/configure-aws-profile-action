@@ -1,6 +1,6 @@
 name: Configure Multiple AWS Roles
 
-description: Configures an OIDC AWS Role Session as an aws config profile.
+description: Drop-in replacement for aws-actions/configure-aws-credentials with additional features to configure multiple AWS roles as AWS profiles.
 
 branding:
   icon: "cloud"
@@ -9,12 +9,12 @@ branding:
 inputs:
   # Additional inputs vs aws-actions/configure-aws-credentials@v4
   profile:
-    required: true
+    required: false
     description: Name of profile to be created
     default: "default"
   only-profile:
     description: Whether to unset credentials in the environment after writing to the profile. May be useful if you run this action multiple times in the same job
-    default: "true"
+    default: "false"
     required: false
   whoami:
     description: Whether to run `aws sts get-caller-identity` after configuring the profile
@@ -71,6 +71,9 @@ inputs:
   managed-session-policies:
     description: Define a list of managed session policies to use when assuming a role
     required: false
+  # output-credentials:
+  #   description: Whether to set credentials as step output
+  #   required: false
   unset-current-credentials:
     description: Whether to unset the existing credentials in your runner. May be useful if you run this action multiple times in the same job
     required: false
@@ -156,7 +159,7 @@ runs:
     # We cannot unset the variables due to https://github.com/actions/runner/issues/1126, but we can set them to fake values to prevent accidental use
     - name: Set AWS Environment Variables to fake values
       id: unset-env-vars
-      if: inputs.only-profile
+      if: ${{ inputs.only-profile == 'true' }}
       shell: bash
       run: |
         echo "Setting dummy AWS Environment Variables"
@@ -166,7 +169,7 @@ runs:
 
     - name: Check Who Am I
       id: whoami
-      if: inputs.whoami
+      if: ${{ inputs.whoami == 'true' }}
       shell: bash
       run: |
         aws sts --profile ${{ inputs.profile }} get-caller-identity
