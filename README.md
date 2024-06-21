@@ -13,7 +13,7 @@ The below inputs are in additional to the [official action inputs](https://githu
 
 | Input Name   | Description                                                                     | Required | default values |
 | :----------- | :------------------------------------------------------------------------------ | :------: | :------------: |
-| profile      | Name of the profile to be created                                               | `false`  |    default     |
+| profile      | Name of the profile to be created                                               | `false`  |   "default"    |
 | only-profile | This will unset the AWS env vars to empty string. Necessary for using profiles  | `false`  |    `false`     |
 | whoami       | Run additional `aws sts get-caller-identity` to check if the profile is working |  `true`  |    `false`     |
 

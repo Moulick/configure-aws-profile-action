@@ -77,6 +77,7 @@ inputs:
   unset-current-credentials:
     description: Whether to unset the existing credentials in your runner. May be useful if you run this action multiple times in the same job
     required: false
+    default: "true" # Setting to true by default as recommended by the official action if called multiple times in the same job
   disable-retry:
     description: Whether to disable the retry and backoff mechanism when the assume role call fails. By default the retry mechanism is enabled
     required: false
@@ -106,17 +107,8 @@ outputs:
     value: ${{ steps.save-to-profile.outputs.profile }}
 
 runs:
-  using: "composite"
+  using: composite
   steps:
-    # Unset the variables if they are empty strings, sometimes they do funny things
-    - name: Unset empty AWS env vars
-      id: unset-empty-env-vars
-      shell: bash
-      run: |
-        if   [[ -z "$AWS_ACCESS_KEY_ID" ]]   ; then unset AWS_ACCESS_KEY_ID;     fi
-        if   [[ -z "$AWS_SESSION_TOKEN" ]]   ; then unset AWS_SESSION_TOKEN;     fi
-        if [[ -z "$AWS_SECRET_ACCESS_KEY" ]] ; then unset AWS_SECRET_ACCESS_KEY; fi
-
     - name: Get AWS Credentials
       id: aws-credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -154,7 +146,7 @@ runs:
         aws configure set --profile ${{ inputs.profile }} aws_secret_access_key ${{ steps.aws-credentials.outputs.aws-secret-access-key }}
         aws configure set --profile ${{ inputs.profile }} aws_session_token     ${{ steps.aws-credentials.outputs.aws-session-token }}
         echo "profile=${{ inputs.profile }}" >> $GITHUB_OUTPUT
-        echo "::notice::AWS Profile ${{ inputs.profile }} configured successfully"
+        printf "::notice::\x1b[32;1mAWS Profile ${{ inputs.profile }} configured successfully\x1b[0m\n"
 
     # We cannot unset the variables due to https://github.com/actions/runner/issues/1126, but we can set them to fake values to prevent accidental use
     - name: Set AWS Environment Variables to fake values
@@ -163,9 +155,9 @@ runs:
       shell: bash
       run: |
         echo "Setting dummy AWS Environment Variables"
-        echo AWS_SECRET_ACCESS_KEY="no-value-here" >> $GITHUB_ENV
-        echo AWS_ACCESS_KEY_ID="no-value-here"     >> $GITHUB_ENV
-        echo AWS_SESSION_TOKEN="no-value-here"     >> $GITHUB_ENV
+        echo AWS_SECRET_ACCESS_KEY="this-value-has-been-set-to-invalid-to-prevent-wrong-creds-from-being-used" >> $GITHUB_ENV
+        echo     AWS_ACCESS_KEY_ID="this-value-has-been-set-to-invalid-to-prevent-wrong-creds-from-being-used" >> $GITHUB_ENV
+        echo     AWS_SESSION_TOKEN="this-value-has-been-set-to-invalid-to-prevent-wrong-creds-from-being-used" >> $GITHUB_ENV
 
     - name: Check Who Am I
       id: whoami
